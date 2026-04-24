@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 
 const CarParts = () => {
-  // 1. IMPORTANTE: Inicializar siempre como un array vacío []
+  // --- ESTADOS (Paso 5 y 6) ---
   const [parts, setParts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("")
-  const [visibleCount, setVisibleCount] = useState(10);
- 
+  const [searchTerm, setSearchTerm] = useState(""); 
+  const [visibleCount, setVisibleCount] = useState(10); // Control de paginación (Paso 4)
 
-  const API_URL = "https://api.jsonbin.io/v3/b/69e535e236566621a8ce210a";
-  const API_KEY = "$2a$10$7L0fDBh3v77EF1usWl4EfOwXzcST0EFg9vISOOTUPBq7xcutgDBU2";
-
+  // Datos de la API proporcionados en el examen
+  const API_URL = import.meta.env.VITE_API_URL;
+  const API_KEY = import.meta.env.VITE_API_KEY;
+  
   useEffect(() => {
     const fetchArticles = async () => {
       try {
@@ -20,12 +20,10 @@ const CarParts = () => {
           headers: { 'X-Access-Key': API_KEY }
         });
 
-        if (!response.ok) throw new Error("Error en la petición");
+        if (!response.ok) throw new Error("Error al cargar los datos de la API");
 
         const data = await response.json();
-        
-        // 2. CAMBIO AQUÍ: Asegurar que entramos a record.articles
-        // El operador || [] asegura que si algo falla, siga siendo un array
+        // Accedemos a la ruta exacta: record -> articles
         setParts(data?.record?.articles || []);
       } catch (err) {
         setError(err.message);
@@ -39,68 +37,124 @@ const CarParts = () => {
   const filteredParts = parts.filter(part => 
     part.articleProductName.toLowerCase().includes(searchTerm.toLowerCase())
   );
- 
+
   const displayedParts = filteredParts.slice(0, visibleCount);
-  if (loading) return <div className="loading">Cargando...</div>;
-  if (error) return <div className="error">Error: {error}</div>;
 
+ 
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '3rem', color: 'white' }}>
+        <div className="spinner"></div>
+        <p>Cargando repuestos desde la API...</p>
+      </div>
+    );
+  }
 
- return (
-  <section id="parts">
-    <h2>Listado de Repuestos</h2>
+  if (error) {
+    return <div style={{ color: 'red', textAlign: 'center', padding: '2rem' }}>Error: {error}</div>;
+  }
 
-    <div className="search-container" style={{ marginBottom: '2rem', textAlign: 'center' }}>
-      <input 
-        type="text" 
-        placeholder="Buscar por nombre de repuesto..." 
-        value={searchTerm}
-        onChange={(e) => {
-          setSearchTerm(e.target.value);
-          setVisibleCount(10); // Reiniciamos la paginación al buscar
-        }}
-        className="search-input"
-        style={{
-          padding: '10px',
-          width: '100%',
-          maxWidth: '400px',
-          borderRadius: '8px',
-          border: '1px solid #ccc'
-        }}
-      />
-    </div>
+  return (
+    <section id="parts" style={{ padding: '2rem', color: 'white' }}>
+      <header style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <p style={{ color: '#aaa', fontSize: '0.8rem', textTransform: 'uppercase' }}>Catálogo</p>
+        <h2 style={{ fontSize: '2.5rem', margin: '0.5rem 0' }}>Repuestos</h2>
+        <p style={{ color: '#888' }}>Mostrando {displayedParts.length} de {filteredParts.length} artículos</p>
+      </header>
 
-    <div className="carparts-grid">
+   
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '3rem' }}>
+        <input 
+          type="text" 
+          placeholder="Buscar por nombre o código..." 
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setVisibleCount(10); // Reiniciar a 10 al buscar
+          }}
+          style={{
+            width: '100%',
+            maxWidth: '500px',
+            padding: '12px 20px',
+            borderRadius: '8px',
+            border: '1px solid #333',
+            backgroundColor: '#1a1a1a',
+            color: 'white',
+            fontSize: '1rem'
+          }}
+        />
+      </div>
+
+      <div className="carparts-grid" style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+        gap: '20px' 
+      }}>
         {displayedParts.length > 0 ? (
           displayedParts.map((item) => (
-            <div key={item.articleId} className="part-card">
-              <div className="part-image-placeholder">
-                 <img 
-                   src={item.s3image} 
-                   alt={item.articleProductName} 
-                   style={{ width: '100%', height: '180px', objectFit: 'cover' }}
-                   onError={(e) => { e.target.src = 'https://via.placeholder.com/300x180?text=Sin+Imagen'; }}
-                 />
+            <div key={item.articleId} className="part-card" style={{
+              backgroundColor: '#1e1e26',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
+            }}>
+    
+              <div style={{ width: '100%', height: '200px', overflow: 'hidden' }}>
+                <img 
+                  src={item.s3image} 
+                  alt={item.articleProductName} 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover', // Mantiene proporción sin estirar
+                    objectPosition: 'center' 
+                  }}
+                  onError={(e) => { e.target.src = 'https://via.placeholder.com/300x200?text=No+Image'; }}
+                />
               </div>
-              <div className="part-details" style={{ padding: '1rem' }}>
-                <h3 style={{ fontSize: '1.1rem', margin: '0.5rem 0' }}>{item.articleProductName}</h3>
-                <p style={{ fontSize: '0.9rem', color: '#666' }}>Proveedor: {item.supplierName}</p>
-                <p style={{ fontWeight: 'bold', color: '#1a237e' }}>ID: {item.articleId}</p>
+
+              <div style={{ padding: '1.2rem' }}>
+                <p style={{ color: '#666', fontSize: '0.75rem', marginBottom: '0.3rem' }}>{item.articleProductName.toUpperCase()}</p>
+                <h3 style={{ fontSize: '1.1rem', marginBottom: '0.8rem' }}>{item.articleProductName}</h3>
+                <p style={{ fontSize: '0.85rem', color: '#aaa', margin: '4px 0' }}>{item.articleNo}</p>
+                
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#888' }}>{item.supplierName}</span>
+                  <span style={{ color: '#7e57c2', fontWeight: 'bold' }}>#{item.supplierId}</span>
+                </div>
+                <p style={{ color: '#3f51b5', fontWeight: 'bold', marginTop: '10px' }}>ID: {item.articleId}</p>
               </div>
             </div>
           ))
-        ): (
-        <p>No se encontraron resultados para "{searchTerm}"</p>
+        ) : (
+          <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem' }}>
+            <p>No se encontraron repuestos que coincidan con su búsqueda.</p>
+          </div>
+        )}
+      </div>
+
+     
+      {filteredParts.length > visibleCount && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '3rem' }}>
+          <button 
+            className="cta-button" 
+            onClick={() => setVisibleCount(prev => prev + 10)}
+            style={{
+              padding: '12px 30px',
+              backgroundColor: '#31313f',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: '600'
+            }}
+          >
+            Ver más
+          </button>
+        </div>
       )}
-    </div>
-    
-    {/* El botón "Ver más" ahora debe depender de filteredParts */}
-    {filteredParts.length > visibleCount && (
-      <button onClick={() => setVisibleCount(prev => prev + 10)}>
-        Ver más
-      </button>
-    )}
-  </section>
-);
+    </section>
+  );
 };
 
 export default CarParts;

@@ -5,7 +5,7 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="nav-container">
-        <Link title="Ir al inicio" to="/" className="nav-logo">🚗 Car Parts</Link>
+        <Link title="Ir al inicio" to="/" className="nav-logo">Car Parts</Link>
         <ul className="nav-links">
           <li>
             <Link to="/" activeProps={{ style: { fontWeight: 'bold', color: 'var(--accent-color)' } }}>

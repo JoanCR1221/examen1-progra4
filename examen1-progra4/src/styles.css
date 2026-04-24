@@ -1,0 +1,170 @@
+/* --- VARIABLES GLOBALES --- */
+:root {
+  --bg-color: #121212;
+  --card-bg: #1e1e26;
+  --text-main: #ffffff;
+  --text-secondary: #aaaaaa;
+  --accent-color: #7e57c2; /* Morado del ejemplo */
+  --accent-hover: #9575cd;
+  --border-color: #333333;
+}
+
+/* --- ESTILOS BASE --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+/* --- SECCIÓN DE REPUESTOS --- */
+#parts {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+header h2 {
+  font-size: 2.5rem;
+  margin: 10px 0;
+}
+
+/* --- BUSCADOR (PASO 5) --- */
+.search-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 500px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: #1a1a1a;
+  color: white;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+/* --- GRID DE TARJETAS --- */
+.carparts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+/* --- TARJETA DE REPUESTO --- */
+.part-card {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.part-card:hover {
+  transform: translateY(-5px);
+}
+
+/* --- CONTENEDOR DE IMAGEN (FIX PARA IMÁGENES ESTIRADAS) --- */
+.part-image-placeholder {
+  width: 100%;
+  height: 200px; /* Alto fijo del prototipo */
+  overflow: hidden;
+  background-color: #2a2a2a;
+}
+
+.part-image-placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Mantiene la proporción y recorta el exceso sin estirar */
+  object-position: center;
+}
+
+/* --- DETALLES DEL TEXTO --- */
+.part-details {
+  padding: 20px;
+}
+
+.part-details h3 {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  color: var(--text-main);
+}
+
+.part-details p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 5px 0;
+}
+
+.id-text {
+  color: var(--accent-color);
+  font-weight: bold;
+  margin-top: 10px !important;
+  display: block;
+}
+
+/* --- BOTÓN VER MÁS (PASO 4) --- */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
+}
+
+.cta-button {
+  padding: 12px 35px;
+  background-color: var(--card-bg);
+  color: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.cta-button:hover {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+/* --- ESTADOS DE CARGA Y ERROR --- */
+.loading, .error {
+  text-align: center;
+  padding: 50px;
+  font-size: 1.2rem;
+}
+
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: var(--accent-color);
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
